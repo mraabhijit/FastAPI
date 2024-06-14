@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from enum import Enum
-from typing import Union
+from typing import Union, Optional
 
 app = FastAPI()
 
@@ -47,7 +47,7 @@ async def read_favorite_book():
 
 # Query Parameter
 @app.get("/books")
-async def get_books(skip_book: Union[str, None] = None):
+async def get_books(skip_book: Optional[str] = None):
     if skip_book: 
         NEW_BOOK = BOOKS.copy()
         del NEW_BOOK[skip_book]
