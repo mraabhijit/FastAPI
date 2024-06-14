@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from enum import Enum
 
 app = FastAPI()
 
@@ -12,6 +13,13 @@ BOOKS = {
 }
 
 
+class DirectionName(str, Enum):
+    north = "North"
+    south = "South"
+    east = "East"
+    west = "West"
+
+
 @app.get('/')
 async def read_all_books():
     return BOOKS
@@ -21,6 +29,16 @@ async def read_all_books():
 # async def read_book(book_id: int):
 #     return {"book_title": book_id}
 
+@app.get("/directions/{direction_name}")
+async def get_direction(direction_name: DirectionName):
+    if direction_name == DirectionName.north:
+        return {"direction": direction_name, "sub": 'Up'}
+    if direction_name == DirectionName.south:
+        return {"direction": direction_name, "sub": 'Down'}
+    if direction_name == DirectionName.west:
+        return {"direction": direction_name, "sub": 'Left'}
+    return {"direction": direction_name, "sub": "Right"}
+    
 
 @app.get("/books/mybook")
 async def read_favorite_book():
