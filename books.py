@@ -15,3 +15,20 @@ BOOKS = {
 @app.get('/')
 async def read_all_books():
     return BOOKS
+
+
+# @app.get("/books/{book_id}")
+# async def read_book(book_id: int):
+#     return {"book_title": book_id}
+
+
+@app.get("/books/mybook")
+async def read_favorite_book():
+    return {"book_title": "My Favourite Book"}
+
+# Parameterized calls should be placed below non-parametrized calls
+# Otherwise the path to the get request would think that the parameter is required.
+
+@app.get("/books/{book_id}")
+async def read_book(book_id: int):
+    return {"book_title": book_id}
