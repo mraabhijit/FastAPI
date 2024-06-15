@@ -93,3 +93,14 @@ async def update_book(book_name: str,
         return BOOKS
     
     return f"Invalid Request. Book named {book_name} not found in database. Try adding the book using {create_book}."
+
+
+# Delete request to remove entry
+@app.delete('/{book_name}')
+async def delete_book(book_name: str):
+    if book_name in BOOKS:
+        del BOOKS[book_name]
+
+        return f'Book: {book_name} deleted.'
+    
+    return f'Book: {book_name} not found.'
