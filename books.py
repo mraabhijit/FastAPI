@@ -54,6 +54,15 @@ async def get_books(skip_book: Optional[str] = None):
         return NEW_BOOK
     return BOOKS
 
+
+# Assignment Q1. Create a new read book function that uses query params instead of path params.
+@app.get('/booksquery')
+async def read_query_book(book_id: int):
+    book_name = f'book_{book_id}'
+    return BOOKS.get(book_name, 
+                     f'Book: {book_name} not found.')
+
+
 # Parameterized calls should be placed below non-parametrized calls
 # Otherwise the path to the get request would think that the parameter is required.
 
@@ -104,3 +113,14 @@ async def delete_book(book_name: str):
         return f'Book: {book_name} deleted.'
     
     return f'Book: {book_name} not found.'
+
+
+# Assignment 2. Create a new delete book function that uses query params instead of path params.
+@app.delete('/')
+async def delete_book(book_name: str):
+    if book_name in BOOKS:
+        del BOOKS[book_name]
+
+        return f'Book: {book_name} deleted.'
+    
+    return f'Book: {book_name} not found.'    
