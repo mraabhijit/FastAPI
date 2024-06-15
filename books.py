@@ -79,3 +79,17 @@ async def create_book(book_title: str, book_author: str):
     
     BOOKS[f'book_{current_book_idx + 1}'] = {'title': book_title, 'author': book_author}
     return BOOKS.get(f'book_{current_book_idx+1}', 'No Book Added')
+
+
+# Put request to update entries
+@app.put('/{book_name}')
+async def update_book(book_name: str, 
+                      book_title: str,
+                      book_author: str):
+    if book_name in BOOKS:
+        updated_book_information = {'title': book_title, 'author': book_author}
+        BOOKS[book_name] = updated_book_information
+
+        return BOOKS
+    
+    return f"Invalid Request. Book named {book_name} not found in database. Try adding the book using {create_book}."
