@@ -65,3 +65,17 @@ async def read_book_by_name(book_name: str):
 @app.get("/books/{book_id}")
 async def read_book(book_id: int):
     return {"book_title": book_id}
+
+# Post request to add new entry
+@app.post("/")
+async def create_book(book_title: str, book_author: str):
+    current_book_idx = 0
+
+    if len(BOOKS) > 0:
+        for book in BOOKS:
+            idx = int(book.split('_')[-1])
+            if idx > current_book_idx:
+                current_book_idx = idx
+    
+    BOOKS[f'book_{current_book_idx + 1}'] = {'title': book_title, 'author': book_author}
+    return BOOKS.get(f'book_{current_book_idx+1}', 'No Book Added')
