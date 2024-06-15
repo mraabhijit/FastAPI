@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from uuid import UUID
+from typing import Union, Optional
 
 
 app = FastAPI()
@@ -8,10 +9,14 @@ app = FastAPI()
 
 class Book(BaseModel):
     id: UUID 
-    title: str
-    author: str
-    description: str
-    rating: int
+    title: str = Field(min_length=1) # Adding Field to give additional data validation with min length of title
+    author: str = Field(min_length=1, 
+                        max_length=100)
+    description: Optional[str] = Field(title='Description of the book', 
+                             min_length=1,
+                             max_length=100)
+    rating: int = Field(ge=1, 
+                        le=5)
 
 
 BOOKS = []
