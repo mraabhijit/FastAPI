@@ -49,6 +49,13 @@ async def read_all_books(books_to_return: Optional[int] = None):
     return BOOKS
 
 
+@app.get('/book/{book_id}')
+async def read_book(book_id: UUID):
+    for book in BOOKS:
+        if book_id == book.id:
+            return book
+    return f'No Book found by UUID: {book_id}' 
+
 @app.post('/')
 async def create_book(book: Book):
     BOOKS.append(book)
