@@ -72,6 +72,22 @@ async def update_book(book_id: UUID,
             return BOOKS[i]
 
 
+@app.delete('/{book_id}')
+async def delete_book(book_id: UUID):
+    for i,x in enumerate(BOOKS):
+        if x.id == book_id:
+            # # if order of books do not matter
+            # # can swap the book with last book 
+            # # and delete the last book
+            # BOOKS[i], BOOKS[-1] = BOOKS[-1], BOOKS[i]
+            # BOOKS.pop()
+
+            # if order of books matter
+            BOOKS.remove(x)
+            return f"ID: {book_id} deleted."
+    return f"ID: {book_id} not found."
+
+
 def create_books_no_api():
     book_1 = Book(id = "0298822f-121a-4e77-855f-ce2f149c0c20",
                   title='Title 1',
