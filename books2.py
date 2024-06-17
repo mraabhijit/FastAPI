@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request, status, Form
+from fastapi import FastAPI, HTTPException, Request, status, Form, Header
 from pydantic import BaseModel, Field
 from uuid import UUID
 from typing import Union, Optional
@@ -68,6 +68,24 @@ async def book_login(username: str = Form(),
                      password: str = Form()):
     return {'username': username,
             'password': password}
+
+
+USERNAME: str = 'FastAPIUser'
+PASSWORD: str = 'test1234!'
+@app.post('/header/login')
+async def book_login(book_id: int, 
+                     username: Optional[str] = Header(None),
+                     password: Optional[str] = Header(None)):
+    if username == USERNAME and password == PASSWORD:
+        if book_id > 0 and book_id <= len(BOOKS):
+            return BOOKS[book_id-1] 
+        raise raise_item_cannot_be_found_exception()
+    return 'Invalid User'
+
+
+@app.get('/header')
+async def read_header(random_header: Optional[str] = Header(None)):
+    return {'Random-Header': random_header}
 
 
 @app.get('/')
