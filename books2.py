@@ -17,6 +17,17 @@ class Book(BaseModel):
                              max_length=100)
     rating: int = Field(ge=1, 
                         le=5)
+    
+    class Config:
+        json_schema_extra = {
+            'example': {
+                "id": "0298822f-121a-4e77-855f-ce2f149c0c21",
+                "title": "Computer Science Pro",
+                "author": "mraabhijit",
+                "description": "A very nice description of the book",
+                "rating": 5
+            }
+        }
 
 
 BOOKS = []
