@@ -38,14 +38,13 @@ async def read_all_books(books_to_return: Optional[int] = None):
     if len(BOOKS) < 1:
         create_books_no_api()
     # Add functionality to return a fixed number of books
-    if books_to_return >= 0: #and len(BOOKS) >= books_to_return > 0:
-        # i = 1
-        # new_books = []
-        # while i <= books_to_return:
-        #     new_books.append(BOOKS[i-1])
-        #     i += 1
-        # return new_books
-        return BOOKS[:books_to_return]
+    if books_to_return and len(BOOKS) >= books_to_return > 0:
+        i = 1
+        new_books = []
+        while i <= books_to_return:
+            new_books.append(BOOKS[i-1])
+            i += 1
+        return new_books
     return BOOKS
 
 
@@ -61,6 +60,16 @@ async def create_book(book: Book):
     BOOKS.append(book)
 
     return book
+
+
+@app.put('/{book_id}')
+async def update_book(book_id: UUID, 
+                      book: Book):
+    # counter = 0
+    for i, x in enumerate(BOOKS):
+        if x.id == book_id:
+            BOOKS[i] = book
+            return BOOKS[i]
 
 
 def create_books_no_api():
