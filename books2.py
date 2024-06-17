@@ -35,6 +35,21 @@ class Book(BaseModel):
         }
 
 
+# Create No Rating class to mimic the behaviour of 
+# responding only with Username, when user logs in
+# with Username and Password
+class BookNoRating(BaseModel):
+    id: UUID 
+    title: str = Field(min_length=1) 
+    author: str = Field(min_length=1, 
+                        max_length=100)
+    description: Optional[str] = Field(
+        None, 
+        title='Description of the book', 
+        min_length=1,
+        max_length=100)
+
+
 BOOKS = []
 
 
@@ -73,6 +88,19 @@ async def read_book(book_id: UUID):
         if book_id == book.id:
             return book
     raise raise_item_cannot_be_found_exception()
+
+
+# When the function is called, the books will be read from Books class
+# However when the function returns book, FastAPI will automatically
+# convert it's output data to it's type declaration which is BookNoRating
+# and correctly interpret and limit the output data
+@app.get('/book/rating/{book_id}', response_model=BookNoRating)
+async def read_book_no_rating(book_id: UUID):
+    for book in BOOKS:
+        if book_id == book.id:
+            return book
+    raise raise_item_cannot_be_found_exception()
+
 
 @app.post('/')
 async def create_book(book: Book):
