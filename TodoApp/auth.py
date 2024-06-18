@@ -6,7 +6,13 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal
 from main import get_db, successful_response
-from fastapi.security import OAuth2PasswordRequestForm 
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from datetime import datetime, timedelta
+from jose import jwt
+
+
+SECRET_KEY = "KlgHdwQudw323130Iklsdf9231sdpetbg8"
+ALGORITHM = "HS256"
 
 
 class CreateUser(BaseModel):
@@ -23,6 +29,7 @@ bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # this will create all the tables and elements
 models.Base.metadata.create_all(bind=engine)
 
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='token')
 
 app = FastAPI()
 
@@ -48,6 +55,22 @@ def authenticate_user(username: str,
     if not verify_password(password, user.hashed_password):
         return False
     return user
+
+
+def create_access_token(username: str, 
+                        user_id: int, 
+                        expires_delta: Optional[timedelta] = None):
+    encode = {'sub': username, 
+              'id': user_id}
+    if expires_delta:
+        expire = datetime.now() + expires_delta
+    else:
+        expire = datetime.now() + timedelta(minutes=15)
+    encode.update({'exp': expire})
+
+    return jwt.encode(encode, 
+                      SECRET_KEY, 
+                      algorithm=ALGORITHM)
 
 
 @app.post('/create/user')
@@ -82,4 +105,10 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             status_code=404,
             detail="User not found."
         )
-    return "User Validated"
+    # return "User Validated"
+    token_expires = timedelta(minutes=20)
+    token = create_access_token(user.username, 
+                                user.id, 
+                                expires_delta=token_expires)
+    
+    return {"token": token}
