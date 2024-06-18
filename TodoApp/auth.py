@@ -8,7 +8,7 @@ from database import engine, SessionLocal
 from main import get_db, successful_response
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from datetime import datetime, timedelta
-from jose import jwt
+from jose import jwt, JWTError
 
 
 SECRET_KEY = "KlgHdwQudw323130Iklsdf9231sdpetbg8"
@@ -73,6 +73,25 @@ def create_access_token(username: str,
                       algorithm=ALGORITHM)
 
 
+async def get_current_user(token: str = Depends(oauth2_bearer)):
+    try:
+        payload = jwt.decode(token, 
+                             SECRET_KEY, 
+                             algorithms= [ALGORITHM])
+        username: str = payload.get("sub")
+        user_id: str = payload.get("id")
+
+        if not (username or user_id):
+            raise HTTPException(status_code=404,
+                                detail="User not found")
+        return {
+            "username": username,
+            "id": user_id
+        }    
+    except JWTError:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    
 @app.post('/create/user')
 async def create_new_user(create_user: CreateUser, 
                           db: Session = Depends(get_db)):
