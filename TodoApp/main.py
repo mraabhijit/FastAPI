@@ -1,9 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends
 import models
-from database import engine, SessionLocal
+from database import engine
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 from typing import Optional
+from utils import get_db, successful_response, http_exception
+from auth import get_current_user, get_user_exception
 
 
 app = FastAPI()
@@ -14,14 +16,6 @@ app = FastAPI()
 # CREATE TABLE statements to the database
 # once the following code is executed, a .db file is generated with the provided config
 models.Base.metadata.create_all(bind=engine)
-
-
-def get_db():
-    try:
-        db = SessionLocal()
-        yield db
-    finally:
-        db.close()
 
 
 class Todo(BaseModel):
@@ -48,6 +42,16 @@ async def read_todo(todo_id: int,
     if todo_model:
         return todo_model
     raise http_exception()
+
+
+@app.get('/todos/user')
+async def read_all_by_user(user: dict = Depends(get_current_user), 
+                           db: Session = Depends(get_db)):
+    if not user:
+        raise get_user_exception
+    return db.query(models.Todos) \
+             .filter(models.Todos.owner_id == user.get('id')) \
+             .all()
 
 
 @app.post('/')
@@ -104,15 +108,3 @@ async def delete_todo(todo_id: int,
     db.commit()
 
     return successful_response(200)
-
-
-def successful_response(status_code: int):
-    return {
-        'status': status_code,
-        'transaction': 'Successful'
-    }
-
-
-def http_exception():
-    raise HTTPException(status_code=404,
-                        detail="Todo not found")
