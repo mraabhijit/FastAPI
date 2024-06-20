@@ -1,11 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from typing import Optional
 import models
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-from database import engine, SessionLocal
-from main import get_db, successful_response
+from database import engine
+from utils import get_db, successful_response, token_exception, get_user_exception
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
@@ -127,22 +127,3 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
                                 expires_delta=token_expires)
     
     return {"token": token}
-
-
-# Exceptions
-def get_user_exception():
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"}
-    )
-    return credentials_exception
-
-
-def token_exception():
-    token_exception_response = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Incorrect username or password",
-        headers={"WWW-Authenticate": "Bearer"}
-    )
-    return token_exception_response
