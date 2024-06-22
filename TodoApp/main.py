@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 import models
 from database import engine
-from routers import auth, todos
+from routers import auth, todos, users
 from company import companyapis, dependencies
 
 
@@ -25,3 +25,4 @@ app.include_router(
     dependencies=[Depends(dependencies.get_token_header)],
     responses={418: {"description": "Internal Use Only"}}
 ) # external routing added here to not give the companyapis their own prefix and tags.
+app.include_router(users.router)
