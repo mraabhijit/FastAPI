@@ -1,4 +1,7 @@
-from fastapi import FastAPI, Depends
+import sys
+sys.path.append('..')
+
+from fastapi import Depends, APIRouter
 from pydantic import BaseModel
 from typing import Optional
 import models
@@ -31,7 +34,8 @@ models.Base.metadata.create_all(bind=engine)
 
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl='token')
 
-app = FastAPI()
+# Remove new app, instead add a route to main
+router = APIRouter()
 
 
 def get_password_hash(password: str):
@@ -91,7 +95,7 @@ async def get_current_user(token: str = Depends(oauth2_bearer)):
         raise get_user_exception()
     
 
-@app.post('/create/user')
+@router.post('/create/user')
 async def create_new_user(create_user: CreateUser, 
                           db: Session = Depends(get_db)):
     create_user_model = models.Users()
@@ -112,7 +116,7 @@ async def create_new_user(create_user: CreateUser,
     return successful_response(status_code=201)
 
 
-@app.post('/token')
+@router.post('/token')
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), 
                                  db: Session = Depends(get_db)):
     user = authenticate_user(username=form_data.username, 
