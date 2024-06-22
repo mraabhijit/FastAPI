@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 from typing import Optional
 from utils import get_db, successful_response, http_exception
-from auth import get_current_user, get_user_exception
+from routers import auth
+from routers.auth import get_current_user, get_user_exception
 
 
 app = FastAPI()
@@ -16,6 +17,10 @@ app = FastAPI()
 # CREATE TABLE statements to the database
 # once the following code is executed, a .db file is generated with the provided config
 models.Base.metadata.create_all(bind=engine)
+
+
+# include auth functionalities in main
+app.include_router(auth.router)
 
 
 class Todo(BaseModel):
