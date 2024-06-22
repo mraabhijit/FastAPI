@@ -35,7 +35,11 @@ models.Base.metadata.create_all(bind=engine)
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl='token')
 
 # Remove new app, instead add a route to main
-router = APIRouter()
+router = APIRouter(
+    prefix="/auth", # all api of auth.py with start with /auth prefix
+    tags=["auth"], # all api of auth.py will be clubbed under tag auth
+    responses={401: {"user": "Not authorized"}} # a default response
+)
 
 
 def get_password_hash(password: str):

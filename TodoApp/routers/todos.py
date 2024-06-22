@@ -12,7 +12,11 @@ from utils import get_db, successful_response, http_exception
 from .auth import get_current_user, get_user_exception
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/todos", # all api of todo.py with start with /todo prefix
+    tags=["todos"], # all api of todo.py will be clubbed under tag todo
+    responses={404: {"description": "Not found"}} # a default response
+)
 
 
 # .metdata: MetaData object where newly defined Table objects are collected.
@@ -36,7 +40,7 @@ async def read_all(db: Session = Depends(get_db)):
     return db.query(models.Todos).all()
 
 
-@router.get('/todos/{todo_id}')
+@router.get('/{todo_id}')
 async def read_todo(todo_id: int, 
                     user: dict = Depends(get_current_user),
                     db: Session = Depends(get_db)):
@@ -53,7 +57,7 @@ async def read_todo(todo_id: int,
     raise http_exception()
 
 
-@router.get('/todos/user')
+@router.get('/user')
 async def read_all_by_user(user: dict = Depends(get_current_user), 
                            db: Session = Depends(get_db)):
     if not user:
