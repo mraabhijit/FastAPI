@@ -41,7 +41,7 @@ class Todo(BaseModel):
 
 @router.get('/test')
 async def test(request: Request):
-    return templates.TemplateResponse("home.html", 
+    return templates.TemplateResponse("register.html", 
                                       {'request': request})
 
 
