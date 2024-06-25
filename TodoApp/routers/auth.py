@@ -3,7 +3,7 @@ sys.path.append("..")
 
 from starlette.responses import RedirectResponse
 
-from fastapi import Depends, HTTPException, status, APIRouter, Request, Response
+from fastapi import Depends, HTTPException, status, APIRouter, Request, Response, Form
 from pydantic import BaseModel
 from typing import Optional
 import models
@@ -184,11 +184,69 @@ async def login(request: Request,
         )
 
 
+@router.get('/logout')
+async def logout(request: Request):
+    msg = "Logout Successful"
+    response = templates.TemplateResponse(
+        "login.html", 
+        {"request": request,
+         "msg": msg}
+    )
+    response.delete_cookie(key='access_token')
+    return response
+
+
 @router.get('/register', response_class=HTMLResponse)
 async def register(request: Request):
     return templates.TemplateResponse(
         "register.html",
         {'request': request}
+    )
+
+
+@router.post('/register', response_class=HTMLResponse)
+async def register_user(request:Request,
+                        email: str = Form(), 
+                        username: str = Form(),
+                        firstname: str = Form(),
+                        lastname: str = Form(),
+                        password: str = Form(),
+                        password2: str = Form(),
+                        db: Session = Depends(get_db)
+                        ):
+    
+    validation1 = db.query(models.Users) \
+                    .filter(models.Users.username == username) \
+                    .first()
+    
+    validation2 = db.query(models.Users) \
+                    .filter(models.Users.email == email) \
+                    .first()
+
+    if password != password2 or validation1 is not None or validation2 is not None:
+        msg = "Invalid Registration Request"
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, 
+             "msg": msg}
+        )
+    
+    user_model = models.Users()
+    user_model.email = email
+    user_model.username = username
+    user_model.first_name = firstname
+    user_model.last_name = lastname
+    user_model.hashed_password = get_password_hash(password=password)
+    user_model.is_active = True
+
+    db.add(user_model)
+    db.commit()
+
+    msg = "User Successfully Created"
+    return templates.TemplateResponse(
+        "login.html",
+        {"request": request, 
+         "msg": msg}
     )
 
 
