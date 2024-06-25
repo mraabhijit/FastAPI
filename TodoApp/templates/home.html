@@ -14,6 +14,7 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Info</th>
+                                <th scope="col">Priority</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
@@ -23,6 +24,7 @@
                             <tr class="pointer">
                                 <td>{{ loop.index }}</td>
                                 <td>{{ todo.title }}</td>
+                                <td>{{ todo.priority }}</td>
                                 <td>
                                     <button type="button" class="btn btn-success">Complete</button>
                                     <button onclick="window.location.href ='edit/{{todo.id}}'" type="button" class="btn btn-info">Edit</button>
